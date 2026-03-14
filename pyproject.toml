@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "bankoperation-13-2"
+version = "0.1.0"
+description = ""
+authors = ["Alexander Schischkin <schischkin2@yandex.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.14"
+requests = "^2.32.5"
+python-dotenv = "^1.2.2"
+types-requests = "^2.32.4.20260107"
+pandas = "^3.0.1"
+openpyxl = "^3.1.5"
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^7.3.0"
+black = "^26.1.0"
+isort = "^8.0.1"
+mypy = "^1.19.1"
+pytest = "^9.0.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^7.0.0"
+pytest = "^9.0.2"
+pandas-stubs = "^3.0.0.260204"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+exclude = '''
+/(
+  \.git
+  | __pycache__
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 119
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = 'venv'
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing --cov-report=html"
+testpaths = ["tests"]

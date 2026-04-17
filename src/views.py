@@ -1,7 +1,15 @@
-from typing import Dict, Any
-from src.utils import (load_transactions, filter_transactions_by_date,
-                       get_greeting, get_cards_info, get_top_transactions,
-                       load_user_settings, get_currency_rates)
+from typing import Any, Dict
+
+from src.utils import (
+    filter_transactions_by_date,
+    get_cards_info,
+    get_currency_rates,
+    get_greeting,
+    get_top_transactions,
+    load_transactions,
+    load_user_settings,
+)
+
 
 def main_page(date_time_str: str) -> Dict[str, Any]:
     """
@@ -14,7 +22,7 @@ def main_page(date_time_str: str) -> Dict[str, Any]:
         Dict[str, Any]: Словарь с данными для JSON-ответа.
     """
     # 1. Загружаем данные
-    df = load_transactions('data/operations.xlsx')
+    df = load_transactions("data/operations.xlsx")
     if df.empty:
         return {"error": "Не удалось загрузить данные"}
 
@@ -31,10 +39,10 @@ def main_page(date_time_str: str) -> Dict[str, Any]:
     top_transactions = get_top_transactions(filtered_df, 5)
 
     # --- НОВАЯ ЧАСТЬ: загружаем настройки и получаем курсы ---
-    settings = load_user_settings('user_settings.json')
-    currency_rates = get_currency_rates(settings.get('user_currencies', []))
+    settings = load_user_settings("user_settings.json")
+    currency_rates = get_currency_rates(settings.get("user_currencies", []))
     # Пока оставляем stock_prices пустым, это для следующего шага
-    stock_prices = []
+    stock_prices: list[dict] = []
 
     # 6. Возвращаем результат
     return {
@@ -42,5 +50,5 @@ def main_page(date_time_str: str) -> Dict[str, Any]:
         "cards": cards,
         "top_transactions": top_transactions,
         "currency_rates": currency_rates,  # <-- теперь здесь реальные курсы
-        "stock_prices": stock_prices
+        "stock_prices": stock_prices,
     }

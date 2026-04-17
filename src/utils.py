@@ -1,14 +1,16 @@
 """
 Модуль для работы с данными транзакций.
 """
-from dotenv import load_dotenv
-import requests
+
 import json
 import logging
 import os
-from typing import Any, Dict, List
 from datetime import datetime
+from typing import Dict, Any, List
+
 import pandas as pd
+import requests
+from dotenv import load_dotenv
 
 # 1. СОЗДАЕМ ОТДЕЛЬНЫЙ ОБЪЕКТ ЛОГЕРА
 utils_logger = logging.getLogger("utils")
@@ -102,7 +104,7 @@ def get_greeting(date_time_str: str) -> str:
     """
     try:
         # Преобразуем строку в объект datetime
-        dt = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+        dt = datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S")
         hour = dt.hour
     except ValueError:
         # Если строка некорректна, считаем, что сейчас день (можно и ошибку бросить)
@@ -133,7 +135,7 @@ def load_transactions(file_path: str) -> pd.DataFrame:
     try:
         df = pd.read_excel(file_path)
         # Приводим названия столбцов к нижнему регистру и убираем пробелы для удобства
-        df.columns = df.columns.str.lower().str.replace(' ', '_')
+        df.columns = df.columns.str.lower().str.replace(" ", "_")
         return df
     except FileNotFoundError:
         print(f"Ошибка: Файл {file_path} не найден.")
@@ -155,16 +157,16 @@ def filter_transactions_by_date(df: pd.DataFrame, date_time_str: str) -> pd.Data
         pd.DataFrame: Отфильтрованный DataFrame.
     """
     # Преобразуем строку в datetime
-    target_date = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+    target_date = datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S")
 
     # Получаем первый день месяца
     start_date = target_date.replace(day=1, hour=0, minute=0, second=0)
 
     # Преобразуем колонку 'дата_операции' в datetime
-    df['дата_операции'] = pd.to_datetime(df['дата_операции'], format='%d.%m.%Y %H:%M:%S')
+    df["дата_операции"] = pd.to_datetime(df["дата_операции"], format="%d.%m.%Y %H:%M:%S")
 
     # Фильтруем
-    mask = (df['дата_операции'] >= start_date) & (df['дата_операции'] <= target_date)
+    mask = (df["дата_операции"] >= start_date) & (df["дата_операции"] <= target_date)
 
     return df[mask].copy()
 
@@ -180,20 +182,19 @@ def get_cards_info(df: pd.DataFrame) -> list:
         list: Список словарей с данными по картам.
     """
     # Группируем по номеру карты
-    cards_group = df.groupby('номер_карты').agg({
-        'сумма_платежа': 'sum',
-        'кэшбэк': 'sum'
-    }).reset_index()
+    cards_group = df.groupby("номер_карты").agg({"сумма_платежа": "sum", "кэшбэк": "sum"}).reset_index()
 
     result = []
     for _, row in cards_group.iterrows():
         # Извлекаем последние 4 цифры (удаляем звёздочку)
-        last_digits = row['номер_карты'].replace('*', '')
-        result.append({
-            "last_digits": last_digits,
-            "total_spent": round(row['сумма_платежа'], 2),
-            "cashback": round(row['кэшбэк'], 2)
-        })
+        last_digits = row["номер_карты"].replace("*", "")
+        result.append(
+            {
+                "last_digits": last_digits,
+                "total_spent": round(row["сумма_платежа"], 2),
+                "cashback": round(row["кэшбэк"], 2),
+            }
+        )
 
     return result
 
@@ -210,23 +211,25 @@ def get_top_transactions(df: pd.DataFrame, n: int = 5) -> list:
         list: Список словарей с данными о транзакциях.
     """
     # Сортируем по сумме платежа (по убыванию)
-    sorted_df = df.sort_values('сумма_платежа', ascending=False).head(n)
+    sorted_df = df.sort_values("сумма_платежа", ascending=False).head(n)
 
     result = []
     for _, row in sorted_df.iterrows():
-        result.append({
-            "date": row['дата_операции'].strftime('%d.%m.%Y'),
-            "amount": round(row['сумма_платежа'], 2),
-            "category": row['категория'],
-            "description": row['описание']
-        })
+        result.append(
+            {
+                "date": row["дата_операции"].strftime("%d.%m.%Y"),
+                "amount": round(row["сумма_платежа"], 2),
+                "category": row["категория"],
+                "description": row["описание"],
+            }
+        )
 
     return result
 
 
 # Загружаем переменные окружения из файла .env
 load_dotenv()
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv("API_KEY")
 
 
 def get_currency_rates(currencies: list) -> list:
@@ -248,12 +251,12 @@ def get_currency_rates(currencies: list) -> list:
         try:
             # Формируем URL для запроса курса конкретной валюты к рублю
             url = f"https://api.apilayer.com/exchangerates_data/latest?base={curr}&symbols=RUB"
-            response = requests.get(url, headers={'apikey': API_KEY})
+            response = requests.get(url, headers={"apikey": API_KEY})
             response.raise_for_status()  # Проверяем, что запрос успешен
             data = response.json()
 
-            if data.get('success'):
-                rate = data['rates']['RUB']
+            if data.get("success"):
+                rate = data["rates"]["RUB"]
                 rates.append({"currency": curr, "rate": round(rate, 2)})
             else:
                 rates.append({"currency": curr, "rate": 0.0})
@@ -276,7 +279,14 @@ def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
     """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            # Убеждаемся, что данные — это словарь
+            if isinstance(data, dict):
+                return data
+            return {"user_currencies": ["USD", "EUR"], "user_stocks": []}
     except FileNotFoundError:
-        print(f"Файл настроек {file_path} не найден, использую значения по умолчанию")
+        print(f"Файл настроек {file_path} не найден")
+        return {"user_currencies": ["USD", "EUR"], "user_stocks": []}
+    except json.JSONDecodeError:
+        print(f"Ошибка декодирования JSON в файле {file_path}")
         return {"user_currencies": ["USD", "EUR"], "user_stocks": []}

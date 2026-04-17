@@ -1,7 +1,7 @@
 from typing import Dict, Any
-from src.utils import load_transactions, filter_transactions_by_date, get_greeting
-from src.utils import get_cards_info, get_top_transactions
-
+from src.utils import (load_transactions, filter_transactions_by_date,
+                       get_greeting, get_cards_info, get_top_transactions,
+                       load_user_settings, get_currency_rates)
 
 def main_page(date_time_str: str) -> Dict[str, Any]:
     """
@@ -18,7 +18,7 @@ def main_page(date_time_str: str) -> Dict[str, Any]:
     if df.empty:
         return {"error": "Не удалось загрузить данные"}
 
-    # 2. Фильтруем по дате (с начала месяца)
+    # 2. Фильтруем по дате
     filtered_df = filter_transactions_by_date(df, date_time_str)
 
     # 3. Получаем приветствие
@@ -30,11 +30,17 @@ def main_page(date_time_str: str) -> Dict[str, Any]:
     # 5. Получаем топ-5 транзакций
     top_transactions = get_top_transactions(filtered_df, 5)
 
+    # --- НОВАЯ ЧАСТЬ: загружаем настройки и получаем курсы ---
+    settings = load_user_settings('user_settings.json')
+    currency_rates = get_currency_rates(settings.get('user_currencies', []))
+    # Пока оставляем stock_prices пустым, это для следующего шага
+    stock_prices = []
+
     # 6. Возвращаем результат
     return {
         "greeting": greeting,
         "cards": cards,
         "top_transactions": top_transactions,
-        "currency_rates": [],  # Пока заглушка
-        "stock_prices": []  # Пока заглушка
+        "currency_rates": currency_rates,  # <-- теперь здесь реальные курсы
+        "stock_prices": stock_prices
     }

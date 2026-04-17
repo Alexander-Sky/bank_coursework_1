@@ -1,7 +1,7 @@
 """
 Модуль для работы с данными транзакций.
 """
-
+from dotenv import load_dotenv
 import requests
 import json
 import logging
@@ -224,7 +224,12 @@ def get_top_transactions(df: pd.DataFrame, n: int = 5) -> list:
     return result
 
 
-def get_currency_rates(currencies: List[str]) -> List[Dict[str, Any]]:
+# Загружаем переменные окружения из файла .env
+load_dotenv()
+API_KEY = os.getenv('API_KEY')
+
+
+def get_currency_rates(currencies: list) -> list:
     """
     Получает курсы валют к рублю через API.
 
@@ -232,11 +237,31 @@ def get_currency_rates(currencies: List[str]) -> List[Dict[str, Any]]:
         currencies: Список кодов валют (например, ['USD', 'EUR'])
 
     Returns:
-        List[Dict[str, Any]]: Список словарей с валютами и курсами
+        list: Список словарей [{"currency": "USD", "rate": 73.21}, ...]
     """
-    # TODO: добавить реальный API ключ
-    # Пока заглушка
-    return [{"currency": curr, "rate": 0.0} for curr in currencies]
+    if not API_KEY:
+        print("Ошибка: API_KEY не найден в переменных окружения")
+        return [{"currency": curr, "rate": 0.0} for curr in currencies]
+
+    rates = []
+    for curr in currencies:
+        try:
+            # Формируем URL для запроса курса конкретной валюты к рублю
+            url = f"https://api.apilayer.com/exchangerates_data/latest?base={curr}&symbols=RUB"
+            response = requests.get(url, headers={'apikey': API_KEY})
+            response.raise_for_status()  # Проверяем, что запрос успешен
+            data = response.json()
+
+            if data.get('success'):
+                rate = data['rates']['RUB']
+                rates.append({"currency": curr, "rate": round(rate, 2)})
+            else:
+                rates.append({"currency": curr, "rate": 0.0})
+        except Exception as e:
+            print(f"Ошибка при получении курса для {curr}: {e}")
+            rates.append({"currency": curr, "rate": 0.0})
+
+    return rates
 
 
 def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
@@ -253,5 +278,5 @@ def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
-        print(f"Файл настроек {file_path} не найден")
-        return {"user_currencies": [], "user_stocks": []}
+        print(f"Файл настроек {file_path} не найден, использую значения по умолчанию")
+        return {"user_currencies": ["USD", "EUR"], "user_stocks": []}

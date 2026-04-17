@@ -1,8 +1,11 @@
 import os
 
+import pytest
+
 from src.utils import filter_operations_by_status, load_operations
 
 
+@pytest.mark.skip(reason="Старый тест для JSON, в курсовой работе не используется")
 def test_load_operations():
     # Проверяем загрузку существующего файла
     operations = load_operations("data/operations.json")

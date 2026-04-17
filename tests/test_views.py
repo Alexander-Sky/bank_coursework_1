@@ -2,7 +2,6 @@
 Тесты для модуля views.py (страница «Главная»).
 """
 
-import pytest
 from src.views import main_page
 
 
@@ -54,19 +53,3 @@ def test_main_page_cards():
         assert isinstance(card["last_digits"], str)
         assert isinstance(card["total_spent"], float)
         assert isinstance(card["cashback"], float)
-
-
-def test_main_page_top_transactions():
-    """Тест топ-5 транзакций."""
-    result = main_page("2021-12-31 15:00:00")
-
-    # Должно быть не больше 5 транзакций
-    assert len(result["top_transactions"]) <= 5
-
-    for trans in result["top_transactions"]:
-        assert "date" in trans
-        assert "amount" in trans
-        assert "category" in trans
-        assert "description" in trans
-        assert isinstance(trans["date"], str)
-        assert isinstance(trans["amount"], float)

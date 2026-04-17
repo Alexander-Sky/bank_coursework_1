@@ -1,32 +1,17 @@
 import os
-import pytest
-from src.utils import get_greeting, filter_transactions_by_date, load_transactions, get_cards_info, get_top_transactions
 
+import pandas as pd
 
-@pytest.mark.skip(reason="Старый тест для JSON, в курсовой работе не используется")
-def test_load_operations():
-    # Проверяем загрузку существующего файла
-    operations = load_operations("data/operations.json")
-    assert isinstance(operations, list)
-    assert len(operations) > 0
-
-    # Проверяем обработку пустого файла
-    with open("data/empty.json", "w") as f:
-        f.write("[]")
-    empty_operations = load_operations("data/empty.json")
-    assert empty_operations == []
-    os.remove("data/empty.json")
-
-    # Проверяем обработку не-list содержимого
-    with open("data/invalid.json", "w") as f:
-        f.write("{}")
-    invalid_operations = load_operations("data/invalid.json")
-    assert invalid_operations == []
-    os.remove("data/invalid.json")
-
-    # Проверяем обработку отсутствующего файла
-    non_existent_operations = load_operations("non_existent_file.json")
-    assert non_existent_operations == []
+from src.utils import (
+    filter_operations_by_status,
+    filter_transactions_by_date,
+    get_cards_info,
+    get_currency_rates,
+    get_greeting,
+    get_top_transactions,
+    load_transactions,
+    load_user_settings,
+)
 
 
 def test_filter_operations_by_status():
@@ -79,8 +64,8 @@ def test_filter_transactions_by_date():
     assert filtered is not None
     # Проверяем, что все даты в отфильтрованном диапазоне
     if not filtered.empty:
-        min_date = filtered['дата_операции'].min()
-        max_date = filtered['дата_операции'].max()
+        min_date = filtered["дата_операции"].min()
+        max_date = filtered["дата_операции"].max()
         assert min_date >= pd.Timestamp("2021-12-01")
         assert max_date <= pd.Timestamp("2021-12-31 23:59:59")
 
@@ -111,3 +96,51 @@ def test_get_top_transactions():
         assert "amount" in trans
         assert "category" in trans
         assert "description" in trans
+
+
+def test_get_currency_rates_empty():
+    """Тест получения курсов для пустого списка."""
+    rates = get_currency_rates([])
+    assert rates == []
+
+
+def test_filter_transactions_by_date_empty_df():
+    """Тест фильтрации пустого DataFrame."""
+    # Создаём пустой DataFrame с правильными колонками
+    empty_df = pd.DataFrame(columns=["дата_операции"])
+    filtered = filter_transactions_by_date(empty_df, "2021-12-31 15:00:00")
+    assert filtered.empty
+
+
+def test_get_currency_rates_no_api_key():
+    """Тест получения курсов при отсутствии API ключа."""
+    # Сохраняем оригинальный API_KEY
+    import src.utils
+
+    original_key = src.utils.API_KEY
+    src.utils.API_KEY = None
+
+    try:
+        rates = get_currency_rates(["USD"])
+        assert len(rates) == 1
+        assert rates[0]["currency"] == "USD"
+        assert rates[0]["rate"] == 0.0
+    finally:
+        # Восстанавливаем ключ
+        src.utils.API_KEY = original_key
+
+
+def test_load_user_settings_invalid_json():
+    """Тест загрузки настроек с некорректным JSON."""
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+        f.write("{invalid json}")
+        temp_file = f.name
+
+    try:
+        settings = load_user_settings(temp_file)
+        assert "user_currencies" in settings
+        assert "user_stocks" in settings
+    finally:
+        os.unlink(temp_file)

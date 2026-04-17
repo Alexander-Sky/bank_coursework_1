@@ -6,9 +6,10 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 import pandas as pd
+import pytest
 import requests
 from dotenv import load_dotenv
 
@@ -34,6 +35,7 @@ file_handler.setFormatter(formatter)
 utils_logger.addHandler(file_handler)
 
 
+@pytest.mark.skip(reason="Старый тест для JSON, в курсовой работе не используется")
 def load_operations(file_path: str) -> List[Dict[str, Any]]:
     """
     Загружает операции из JSON-файла.
@@ -267,7 +269,7 @@ def get_currency_rates(currencies: list) -> list:
     return rates
 
 
-def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
+def load_user_settings(file_path: str = "user_settings.json") -> Dict[str, Any]:
     """
     Загружает настройки пользователя из JSON-файла.
 
@@ -278,7 +280,7 @@ def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
         Dict[str, Any]: Словарь с настройками
     """
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
             # Убеждаемся, что данные — это словарь
             if isinstance(data, dict):

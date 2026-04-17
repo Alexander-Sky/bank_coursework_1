@@ -1,77 +1,69 @@
-# Банковский виджет операций
+# Bank Coursework 1 — Приложение для анализа банковских операций
 ## Описание проекта
 
-Проект представляет собой набор инструментов для обработки банковских операций. Основные функции включают фильтрацию и сортировку операций по различным критериям.
+Приложение для анализа банковских транзакций из Excel-файла. Генерирует JSON-данные для веб-страниц,
+предоставляет сервисы для анализа кешбэка, поиска транзакций и формирования отчётов.
 
-## Установка
+## Реализованная функциональность (выбрана задача "Главная")
 
-Требования
+### Страница «Главная»
 
-    Python 3.14+
+Функция `main_page` в модуле `views.py` принимает дату и время и возвращает JSON-ответ со следующими данными:
 
-    Poetry для управления зависимостями
+| Поле | Описание |
+|------|----------|
+| `greeting` | Приветствие в зависимости от времени суток |
+| `cards` | Данные по каждой карте (последние 4 цифры, сумма расходов, кешбэк) |
+| `top_transactions` | Топ-5 транзакций по сумме платежа |
+| `currency_rates` | Курсы валют (USD, EUR) через API |
+| `stock_prices` | Цены акций (заглушка, будет доработано) |
 
-### Установка проекта
-bash
+## Технологии
 
+- Python 3.14
+- Poetry — управление зависимостями
+- pandas — работа с Excel-данными
+- requests — запросы к API для курсов валют
+- pytest — тестирование (60 passed, 1 skipped)
+- flake8, black, isort, mypy — контроль качества кода
+
+
+## Установка и запуск
+
+```bash
 # Клонирование репозитория
-git clone https://github.com/Alexander-Sky/bankoperation_13_2.git
-cd bankoperation_13_2
+git clone https://github.com/Alexander-Sky/bank_coursework_1.git
+cd bank_coursework_1
 
-## Установка зависимостей через Poetry
-
+# Установка зависимостей
 poetry install
+
+# Активация окружения
 poetry shell
 
-# Установка инструментов разработки
-poetry add --group lint flake8 black isort mypy pytest
-poetry add --group dev pytest-cov
+# Запуск тестов
+poetry run pytest
+
+# Проверка качества кода
+poetry run flake8
+poetry run mypy src
 
 # Структура проекта
-Основные модули
+ 
+bank_coursework_1/
+├── data/
+│   └── operations.xlsx      # Excel-файл с транзакциями
+├── src/
+│   ├── utils.py             # Вспомогательные функции
+│   ├── views.py             # Функции для веб-страниц
+│   ├── reports.py           # Функции для отчётов (в разработке)
+│   └── services.py          # Функции для сервисов (в разработке)
+├── tests/                   # Тесты (60 passed, 1 skipped)
+├── user_settings.json       # Настройки пользователя (валюты, акции)
+├── .env                     # Переменные окружения (API-ключ)
+├── pyproject.toml           # Конфигурация Poetry
+└── README.md
 
-    masks.py - функции маскирования номеров карт и счетов
-
-    widget.py - функции форматирования данных для отображения
-
-    processing.py - функции обработки операций
-
-    generators.py - функции генерации тестовых данных
-
-    conftest.py - фикстуры для тестирования
-
-    external_api.py - работа с внешними API (курсы валют)
-
-    operations_parser.py - парсер операций из JSON
-
-    utils.py - вспомогательные функции
-    
-    file_readers.py - чтение финансовых операций из CSV и Excel файлов
-
-## Работа с файлами
-python
-
-from src.file_readers import read_csv_file, read_excel_file
-
-# Чтение CSV файла
-csv_transactions = read_csv_file('data/transactions.csv')
-
-# Чтение Excel файла
-excel_transactions = read_excel_file('data/transactions_excel.xlsx')
-
-Инструменты разработки
-
-    isort - сортировка импортов
-
-    black - форматирование кода
-
-    flake8 - проверка стиля кода
-
-    mypy - статическая типизация
-
-    pytest - тестирование
-
-    coverage - измерение покрытия
 
 # Запуск
 Запуск тестов
@@ -83,7 +75,7 @@ pytest
 ## Запуск с измерением покрытия
 pytest --cov=src --cov-report=html
 
-Проверка стиля кода
+# Проверка стиля кода
 bash
 
 ## Проверка стиля
@@ -98,37 +90,14 @@ isort .
 ## Проверка типов
 mypy src
 
-Использование
-Импорт функций
+Пример использования
 python
+from src.views import main_page
 
-from src.processing import filter_by_state, sort_by_date
-from generators.generators import card_number_generator
+# Получить JSON для главной страницы
+result = main_page("2021-12-31 15:00:00")
+print(result)
 
-## Примеры работы
-Фильтрация операций
-python
-
-operations = [
-    {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
-    {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
-    {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-    {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'}
-]
-
-### Фильтрация по умолчанию (EXECUTED)
-filtered_operations = filter_by_state(operations)
-
-### Фильтрация по CANCELED
-cancelled_operations = filter_by_state(operations, 'CANCELED')
-
-Декоратор логирования
-Описание
-
-Декоратор log предназначен для логирования выполнения функций.
-Параметры
-
-    filename (опционально) - имя файла для записи логов
 
 ## Примеры использования
 python
@@ -143,9 +112,23 @@ def another_function():
 
 # Тестирование
 
-    Текущее покрытие: 84%
-    Покрытие нового модуля file_readers.py: 79%
-    Цель: 100% покрытие тестами
+Name                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------
+src\__init__.py                0      0   100%
+src\decorators.py             32      0   100%
+src\external_api.py           61      9    85%   54, 57-60, 73, 75, 78, 110
+src\file_readers.py           52     11    79%   27, 52, 58-60, 81-83, 104-106
+src\generators.py             13      0   100%
+src\masks.py                  39      0   100%
+src\operations_parser.py      23      9    61%   24, 29-38
+src\processing.py              5      0   100%
+src\reports.py                 0      0   100%
+src\services.py                0      0   100%
+src\utils.py                 134     45    66%   43-64, 77-79, 86-94, 111-115, 142-147, 264-267, 288, 290-291
+src\views.py                  14      1    93%   27
+src\widget.py                 18      2    89%   44-46
+--------------------------------------------------------
+TOTAL                        391     77    80%
 
 ## Генерация отчета о покрытии
 bash

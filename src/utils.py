@@ -237,3 +237,21 @@ def get_currency_rates(currencies: List[str]) -> List[Dict[str, Any]]:
     # TODO: добавить реальный API ключ
     # Пока заглушка
     return [{"currency": curr, "rate": 0.0} for curr in currencies]
+
+
+def load_user_settings(file_path: str = 'user_settings.json') -> Dict[str, Any]:
+    """
+    Загружает настройки пользователя из JSON-файла.
+
+    Args:
+        file_path: Путь к файлу настроек
+
+    Returns:
+        Dict[str, Any]: Словарь с настройками
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Файл настроек {file_path} не найден")
+        return {"user_currencies": [], "user_stocks": []}

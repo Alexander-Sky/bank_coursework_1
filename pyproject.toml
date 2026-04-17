@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bankoperation-13-2"
+name = "bank-coursework-1"
 version = "0.1.0"
 description = ""
 authors = ["Alexander Schischkin <schischkin2@yandex.com>"]

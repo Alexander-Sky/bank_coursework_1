@@ -2,6 +2,7 @@
 Модуль для работы с данными транзакций.
 """
 
+import requests
 import json
 import logging
 import os
@@ -221,3 +222,18 @@ def get_top_transactions(df: pd.DataFrame, n: int = 5) -> list:
         })
 
     return result
+
+
+def get_currency_rates(currencies: List[str]) -> List[Dict[str, Any]]:
+    """
+    Получает курсы валют к рублю через API.
+
+    Args:
+        currencies: Список кодов валют (например, ['USD', 'EUR'])
+
+    Returns:
+        List[Dict[str, Any]]: Список словарей с валютами и курсами
+    """
+    # TODO: добавить реальный API ключ
+    # Пока заглушка
+    return [{"currency": curr, "rate": 0.0} for curr in currencies]

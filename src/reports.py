@@ -4,8 +4,8 @@
 
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from datetime import timedelta
+from typing import Optional
 
 import pandas as pd
 
@@ -53,8 +53,9 @@ def spending_by_category(transactions: pd.DataFrame, category: str, date: Option
     category_mask = filtered_df["категория"].str.lower() == category.lower()
     expenses = filtered_df[category_mask & (filtered_df["сумма_платежа"] < 0)]["сумма_платежа"].sum()
 
-    result = {"category": category, "total_spent": abs(round(expenses, 2))}
+    result = {
+        "category": category,
+        "total_spent": abs(round(float(expenses), 2))  # ← float() решает проблему
+    }
     logger.info(f"Траты по категории '{category}' за последние 3 месяца: {result['total_spent']}")
-    # Стало — преобразуем numpy.int64 в обычный int
-    result["total_spent"] = float(result["total_spent"])
     return json.dumps(result, ensure_ascii=False, indent=2)

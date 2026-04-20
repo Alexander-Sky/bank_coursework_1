@@ -4,7 +4,7 @@
 
 import json
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -28,8 +28,8 @@ def search_transactions(transactions: List[Dict[str, Any]], query: str) -> str:
 
     result = []
     for trans in transactions:
-        description = trans.get('описание', '').lower()
-        category = trans.get('категория', '').lower()
+        description = trans.get("описание", "").lower()
+        category = trans.get("категория", "").lower()
         if query.lower() in description or query.lower() in category:
             result.append(trans)
 

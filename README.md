@@ -1,166 +1,135 @@
-# Банковский виджет операций
+# Bank Coursework — Приложение для анализа банковских операций
+
 ## Описание проекта
 
-Проект представляет собой набор инструментов для обработки банковских операций. Основные функции включают фильтрацию и сортировку операций по различным критериям.
+Приложение для анализа банковских транзакций из Excel-файла. Генерирует JSON-данные для веб-страниц, предоставляет сервисы для анализа кешбэка, поиска транзакций и формирования отчётов. Реализована обработка исключений для корректной работы с данными.
 
-## Установка
+## Реализованная функциональность
 
-Требования
+### Веб-страницы
+- **Главная** — приветствие, карты, топ-5 транзакций, курсы валют
 
-    Python 3.14+
+### Сервисы
+- **Простой поиск** — поиск транзакций по строке в описании или категории
 
-    Poetry для управления зависимостями
+### Отчёты
+- **Траты по категории** — сумма трат за последние 3 месяца
 
-### Установка проекта
-bash
+### Обработка исключений (17.1)
+- Класс Product — выбрасывает `ValueError` при попытке создать товар с нулевым количеством
+- Класс Category — метод `middle_price` корректно обрабатывает пустую категорию (возвращает 0)
+- Округление средней цены до 2 знаков после запятой
 
+## Технологии
+
+- Python 3.14
+- Poetry — управление зависимостями
+- pandas — работа с Excel-данными
+- requests — запросы к API
+- pytest — тестирование
+- flake8, black, isort, mypy — контроль качества кода
+
+## Установка и запуск
+
+```bash
 # Клонирование репозитория
-git clone https://github.com/Alexander-Sky/bankoperation_13_2.git
-cd bankoperation_13_2
+git clone https://github.com/Alexander-Sky/bank_coursework_1.git
+cd bank_coursework_1
 
-## Установка зависимостей через Poetry
-
+# Установка зависимостей
 poetry install
+
+# Активация окружения
 poetry shell
 
-# Установка инструментов разработки
-poetry add --group lint flake8 black isort mypy pytest
-poetry add --group dev pytest-cov
+# Запуск демонстрационного скрипта
+poetry run python main.py
 
-# Структура проекта
-Основные модули
+# Запуск всех тестов
+poetry run pytest
 
-    masks.py - функции маскирования номеров карт и счетов
+# Проверка покрытия
+poetry run pytest --cov=src --cov-report=term-missing
 
-    widget.py - функции форматирования данных для отображения
+# Проверка качества кода
+poetry run flake8
+poetry run mypy src
+Структура проекта
 
-    processing.py - функции обработки операций
+bank_coursework_1/
+├── data/
+│   └── operations.xlsx          # Excel-файл с транзакциями
+├── src/
+│   ├── product.py               # Класс Product (товар)
+│   ├── category.py              # Класс Category (категория)
+│   ├── utils.py                 # Вспомогательные функции
+│   ├── views.py                 # Функции для веб-страниц
+│   ├── reports.py               # Функции для отчётов
+│   └── services.py              # Функции для сервисов
+├── tests/
+│   ├── test_product.py          # Тесты для Product
+│   ├── test_category.py         # Тесты для Category
+│   ├── test_exceptions.py       # Тесты для исключений
+│   └── ...                      # Остальные тесты
+├── user_settings.json           # Настройки пользователя
+├── .env                         # Переменные окружения
+├── main.py                      # Демонстрационный скрипт
+├── pyproject.toml               # Конфигурация Poetry
+└── README.md
 
-    generators.py - функции генерации тестовых данных
+# Покрытие тестами
 
-    conftest.py - фикстуры для тестирования
 
-    external_api.py - работа с внешними API (курсы валют)
+Name                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------
+src\__init__.py                0      0   100%
+src\category.py               13      0   100%
+src\decorators.py             32      0   100%
+src\external_api.py           61      9    85%   54, 57-60, 73, 75, 78, 110
+src\file_readers.py           52     11    79%   27, 52, 58-60, 81-83, 104-106
+src\generators.py             13      0   100%
+src\masks.py                  39      0   100%
+src\operations_parser.py      23      9    61%   24, 29-38
+src\processing.py              5      0   100%
+src\product.py                 8      0   100%
+src\utils.py                  50     17    66%   52-57, 70-72, 79-87
+src\widget.py                 18      2    89%   44-46
+--------------------------------------------------------
+TOTAL                        314     48    85%
 
-    operations_parser.py - парсер операций из JSON
+Coverage HTML written to dir htmlcov
 
-    utils.py - вспомогательные функции
-    
-    file_readers.py - чтение финансовых операций из CSV и Excel файлов
-
-## Работа с файлами
+# Пример использования
+Создание товара с обработкой исключения
 python
+from src.product import Product
 
-from src.file_readers import read_csv_file, read_excel_file
-
-# Чтение CSV файла
-csv_transactions = read_csv_file('data/transactions.csv')
-
-# Чтение Excel файла
-excel_transactions = read_excel_file('data/transactions_excel.xlsx')
-
-Инструменты разработки
-
-    isort - сортировка импортов
-
-    black - форматирование кода
-
-    flake8 - проверка стиля кода
-
-    mypy - статическая типизация
-
-    pytest - тестирование
-
-    coverage - измерение покрытия
-
-# Запуск
-Запуск тестов
-bash
-
-## Запуск всех тестов
-pytest
-
-## Запуск с измерением покрытия
-pytest --cov=src --cov-report=html
-
-Проверка стиля кода
-bash
-
-## Проверка стиля
-flake8
-
-## Форматирование кода
-black .
-
-## Сортировка импортов
-isort .
-
-## Проверка типов
-mypy src
-
-Использование
-Импорт функций
+try:
+    product = Product("Смартфон", "Флагман", 100000.0, 0)
+except ValueError as e:
+    print(f"Ошибка: {e}")  # Товар с нулевым количеством не может быть добавлен
+Подсчёт средней цены в категории
 python
+from src.category import Category
+from src.product import Product
 
-from src.processing import filter_by_state, sort_by_date
-from generators.generators import card_number_generator
+products = [Product("A", "desc", 100.0, 1), Product("B", "desc", 200.0, 1)]
+category = Category("Тест", "Описание", products)
+print(category.middle_price())  # 150.0
 
-## Примеры работы
-Фильтрация операций
-python
+empty_category = Category("Пустая", "Описание", [])
+print(empty_category.middle_price())  # 0.0
 
-operations = [
-    {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
-    {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
-    {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-    {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'}
-]
+# Статус проекта
 
-### Фильтрация по умолчанию (EXECUTED)
-filtered_operations = filter_by_state(operations)
+- Страница «Главная» — реализована
 
-### Фильтрация по CANCELED
-cancelled_operations = filter_by_state(operations, 'CANCELED')
+- Сервис «Простой поиск» — реализован
 
-Декоратор логирования
-Описание
+- Отчёт «Траты по категории» — реализован
 
-Декоратор log предназначен для логирования выполнения функций.
-Параметры
+- Обработка исключений — реализована
 
-    filename (опционально) - имя файла для записи логов
 
-## Примеры использования
-python
-
-@log()
-def my_function(x, y):
-    return x + y
-
-@log(filename="mylog.txt")
-def another_function():
-    # код функции
-
-# Тестирование
-
-    Текущее покрытие: 84%
-    Покрытие нового модуля file_readers.py: 79%
-    Цель: 100% покрытие тестами
-
-## Генерация отчета о покрытии
-bash
-
-pytest --cov=src --cov-report=html
-open htmlcov/index.html
-
-## Вклад в проект
-
-    Создайте новую ветку от develop
-
-    Внесите изменения
-
-    Создайте Pull Request
-
-    Дождитесь ревью
- 
- 
+Контакты
+Автор: Alexander Schischkin

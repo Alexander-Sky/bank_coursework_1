@@ -3,6 +3,7 @@
 """
 
 from typing import List
+
 from src.product import Product
 
 
@@ -26,6 +27,7 @@ class Category:
         """
         try:
             total_price = sum(product.price for product in self.products)
-            return total_price / len(self.products)
+            # Округляем до 2 знаков после запятой
+            return round(total_price / len(self.products), 2)
         except ZeroDivisionError:
             return 0.0

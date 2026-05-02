@@ -1,12 +1,14 @@
-from src.product import Product
 from src.category import Category
+from src.product import Product
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
-    except ValueError as e:
-        print("Возникла ошибка ValueError прерывающая работу программы при попытке добавить продукт с нулевым количеством")
+    except ValueError:
+        print(
+            "Возникла ошибка ValueError прерывающая работу программы "
+            "при попытке добавить продукт с нулевым количеством"
+        )
     else:
         print("Не возникла ошибка ValueError при попытке добавить продукт с нулевым количеством")
 

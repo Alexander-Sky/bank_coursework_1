@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bankoperation-13-2"
+name = "bank-coursework-1"
 version = "0.1.0"
 description = ""
 authors = ["Alexander Schischkin <schischkin2@yandex.com>"]
@@ -25,6 +25,7 @@ pytest = "^9.0.2"
 pytest-cov = "^7.0.0"
 pytest = "^9.0.2"
 pandas-stubs = "^3.0.0.260204"
+coverage = "^7.13.5"
 
 [build-system]
 requires = ["poetry-core"]

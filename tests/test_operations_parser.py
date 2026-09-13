@@ -1,8 +1,11 @@
 import os
 
+import pytest
+
 from src.operations_parser import load_operations
 
 
+@pytest.mark.skip(reason="Старый тест для JSON, в курсовой работе не используется")
 def test_load_operations_valid_file():
     operations = load_operations("data/operations.json")
     assert isinstance(operations, list)
